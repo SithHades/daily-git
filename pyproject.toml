@@ -1,11 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "daily-git"
+name = "daily_git"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "gitpython>=3.1.44",
-    "rich>=14.0.0",
-    "setuptools>=80.1.0",
+description = "A CLI tool to track your git stats daily"
+authors = [
+    { name = "Luca Bruno Knaack", email = "l.knaack93@gmail.com" }
 ]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.7"
+dependencies = [
+    "rich",
+    "GitPython"
+]
+
+[project.scripts]
+daily-git = "daily_git.cli:main_cli"
