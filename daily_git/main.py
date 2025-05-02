@@ -20,6 +20,7 @@ def create_tables(db):
         lines_deleted INTEGER,
         UNIQUE(repository_id, commit_hash)
     )''')
+    db.commit()
 
 def scan_repositories(path):
     repo_paths = []
@@ -58,17 +59,21 @@ def update_commits(db, repo_id, repo_path, user_email):
                        (repo_id, commit.hexsha, author_date, lines_added, lines_deleted))
     db.commit()
 
-def main():
-    config_path = os.path.expanduser('~/.daily_git')
-    if not os.path.exists(config_path):
-        print("Configuration file not found. Please create ~/.daily_git")
-        return
-    with open(config_path) as f:
-        config = json.load(f)
+def main(db=None, config=None):
+    # Load configuration if not provided  
+    if not config:
+        config_path = os.path.expanduser('~/.daily_git')
+        if not os.path.exists(config_path):
+            print("Configuration file not found. Please create ~/.daily_git")
+            return
+        with open(config_path) as f:
+            config = json.load(f)
     
-    db_path = os.path.expanduser('~/.repo_scanner.db')
-    db = sqlite3.connect(db_path)
-    create_tables(db)
+    # Connect to DB if not provided  
+    if not db:
+        db_path = os.path.expanduser('~/.repo_scanner.db')
+        db = sqlite3.connect(db_path)
+        create_tables(db)
     
     repositories_path = config['repositories_path']
     user_email = config['user_email']
@@ -104,7 +109,7 @@ def main():
     more_commits_needed = max(0, average_commits - commits_today)
     more_lines_needed = max(0, average_lines_added - lines_added_today)
     
-    # Display
+    # Display stats
     console = Console()
     table = Table(title="Your Coding Stats")
     table.add_column("Metric", justify="left", style="cyan")

@@ -16,16 +16,22 @@ def parse_arguments():
 
 def run_daily_git(config_path):
     if not os.path.exists(config_path):
-        print("Configuration file not found. Please create ~/.daily_git")
+        print("Configuration file not found. Please create the configuration file at", config_path)
         return
     with open(config_path) as f:
         config = json.load(f)
     
     db_path = os.path.expanduser('~/.repo_scanner.db')
     db = sqlite3.connect(db_path)
+    # Ensure the necessary tables exist.
+    from daily_git.main import create_tables
+    create_tables(db)
     
     main(db, config)
 
-if __name__ == "__main__":
+def main_cli():
     args = parse_arguments()
     run_daily_git(args.config)
+
+if __name__ == "__main__":
+    main_cli()
